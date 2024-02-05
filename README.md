@@ -17,5 +17,5 @@ Proper user authentication is made sure before allowing to access sensitive rout
 //Database:
 Data is stored in the Amazon clusters using MongoDB Atlas.
 Password is stored as hash for enhanced security.
-It is made that the password field is never returned while sending user details on API requests.
+It is made sure that the password field is never returned while sending user details on API requests.
 The generation and verification of OTP is made mandatory before updating the user password to add an extra level of authentication.
