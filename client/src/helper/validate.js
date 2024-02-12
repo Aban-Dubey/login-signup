@@ -71,7 +71,7 @@ function usernameVerify(error={}, values) {
 
 //Verify Password
 function passwordVerify(error={}, values) {
-    const specialChars = /[-!$%^&*()_+|~=`{}\[\]:\/;<>?,.@#]/;
+    const specialChars = /[-!$%^&*()_+|~=`{}[\]:/;<>?,.@#]/;
     if(!values.password){
         error.password = toast.error('Password Required!');
     }else if(values.password.includes(" ")){

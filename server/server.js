@@ -4,14 +4,24 @@ import morgan from 'morgan';
 import cors from 'cors';
 import connect from './database/conn.js';
 import router from './routes/router.js';
+import bodyParser from 'body-parser';
 
 const app = express();
 
 //Middlewares
-app.use(express.json());
+// app.use(express.json());
+app.use(bodyParser.json({ limit: '50mb' }));
+app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 app.use(cors());
 app.use(morgan('tiny'));
 app.disable('x-powered-by'); //less hackers know about our stack
+app.use((err, req, res, next) => {
+    if (err instanceof SyntaxError && err.status === 413 && 'body' in err) {
+      return res.status(413).send({ error: 'Request entity too large' });
+    }
+  
+    next();
+});
 
 const port = 8080;
 

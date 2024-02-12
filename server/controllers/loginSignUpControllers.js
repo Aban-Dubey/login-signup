@@ -2,44 +2,100 @@ import UserModel from "../model/userModel.js";
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import otpGenerator from 'otp-generator';
+import bodyParser from 'body-parser';
 
-export const register = async(req,res,next)=>{
-    const { username, password, profile, email } = req.body;
-
-    //check existing username
-    let existingUser;
+export const register = async (req, res, next) => {
     try {
-        existingUser = await UserModel.findOne({username});
-    } catch (error) {
-        return res.status(500).send({error});
-    }
-
-    //check existing email
-    let existingEmail;
-    try {
-        existingEmail = await UserModel.findOne({email});
-    } catch (error) {
-        return res.status(500).send({error});
-    }
-    if(!existingUser && !existingEmail){
-        const hashedPassword = bcrypt.hashSync(password);
-        const user = new UserModel(
-        {
+      // Parse JSON and url-encoded bodies with increased payload size limit
+      bodyParser.json({ limit: '50mb' })(req, res, async (error) => {
+        if (error) {
+          return res.status(413).send({ error: 'Request entity too large' });
+        }
+  
+        const { username, password, profile, email } = req.body;
+  
+        // Check existing username
+        let existingUser;
+        try {
+          existingUser = await UserModel.findOne({ username });
+        } catch (error) {
+          return res.status(500).send({ error });
+        }
+  
+        // Check existing email
+        let existingEmail;
+        try {
+          existingEmail = await UserModel.findOne({ email });
+        } catch (error) {
+          return res.status(500).send({ error });
+        }
+  
+        if (!existingUser && !existingEmail) {
+          const hashedPassword = bcrypt.hashSync(password);
+          const user = new UserModel({
             username,
             password: hashedPassword,
             profile: profile || '',
-            email
-        });
-        try {
+            email,
+          });
+  
+          try {
             await user.save();
-        } catch (error) {
-            return res.status(500).send({error: "Cannot register, invalid value in fields!"});
+          } catch (error) {
+            return res.status(500).send({ error: 'Cannot register, invalid value in fields!' });
+          }
+  
+          return res.status(201).send({ msg: 'User registered successfully!' });
+        } else {
+          return res.status(500).send({ error: 'Please use a unique username and email!' });
         }
-        return res.status(201).send({msg: "User registered Successfully!"});
-    }else{
-        return res.status(500).send({error: "Please use unique username and email!"});
+      });
+    } catch (error) {
+      console.error(error);
+      return res.status(500).send({ error: 'Internal server error' });
     }
 };
+
+//Initial register controller:
+
+// export const register = async(req,res,next)=>{
+    
+//     const { username, password, profile, email } = req.body;
+
+//     //check existing username
+//     let existingUser;
+//     try {
+//         existingUser = await UserModel.findOne({username});
+//     } catch (error) {
+//         return res.status(500).send({error});
+//     }
+
+//     //check existing email
+//     let existingEmail;
+//     try {
+//         existingEmail = await UserModel.findOne({email});
+//     } catch (error) {
+//         return res.status(500).send({error});
+//     }
+//     if(!existingUser && !existingEmail){
+//         const hashedPassword = bcrypt.hashSync(password);
+//         const user = new UserModel(
+//         {
+//             username,
+//             password: hashedPassword,
+//             profile: profile || '',
+//             email
+//         });
+//         try {
+//             await user.save();
+//         } catch (error) {
+//             return res.status(500).send({error: "Cannot register, invalid value in fields!"});
+//         }
+//         return res.status(201).send({msg: "User registered Successfully!"});
+//     }else{
+//         return res.status(500).send({error: "Please use unique username and email!"});
+//     }
+// };
 
 export const login = async(req,res,next)=>{
     const { username, password } = req.body;
@@ -120,11 +176,16 @@ export const updateUser = async(req,res,next)=>{
         };
     
         const { userId } = req.user;
-        const user = await UserModel.findByIdAndUpdate(userId, newUserData, {
-            new: true,
-            runValidators: true,
-            useFindAndModify: false
-        });
+        var user;
+        try {
+                user = await UserModel.findByIdAndUpdate(userId, newUserData, {
+                new: true,
+                runValidators: true,
+                useFindAndModify: false
+            });
+        } catch (error) {
+            return res.status(500).send({error});
+        }
     
         if(!user) {
             return res.status(404).send({error: "User not found with the given _id"});

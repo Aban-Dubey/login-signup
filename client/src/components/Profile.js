@@ -68,7 +68,7 @@ function Profile() {
                     <form className='py-1' onSubmit={formik.handleSubmit}>
                         <div className='profile flex justify-center py-4'>
                         <label htmlFor='profile'>
-                            <img src={apiData?.profile || file || avatar} className={styles.profile_img} alt='avatar' />
+                            <img src={file || apiData?.profile ||  avatar} className={styles.profile_img} alt='avatar' />
                         </label>
 
                         <input onChange={onUpload} type='file' id='profile' name='profile'/>
