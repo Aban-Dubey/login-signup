@@ -1,7 +1,7 @@
 import axios from 'axios';
 import {jwtDecode} from 'jwt-decode';
 
-axios.defaults.baseURL = "https://login-signup-server-lilac.vercel.app/";
+axios.defaults.baseURL = "https://login-signup-server-lilac.vercel.app";
 
 //Make API requests
 
