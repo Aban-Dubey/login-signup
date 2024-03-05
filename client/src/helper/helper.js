@@ -24,21 +24,46 @@ export async function getUser({username}) {
     }
 };
 
-//Register user
+//Register user initial
+// export async function registerUser(credentials) {
+//     try {
+//         const { data: {msg}, status } = await axios.post(`/api/register`, credentials);
+//         let { username, email } = credentials;
+
+//         //send email
+//         if(status === 201) {
+//             await axios.post('/api/registerMail', { username, userEmail: email, text: msg });
+//         }
+//         return Promise.resolve(msg);
+//     } catch (error) {
+//         return Promise.reject({error});
+//     }
+// };/
+
+// Register user
 export async function registerUser(credentials) {
     try {
-        const { data: {msg}, status } = await axios.post(`/api/register`, credentials);
-        let { username, email } = credentials;
-
-        //send email
-        if(status === 201) {
-            await axios.post('/api/registerMail', { username, userEmail: email, text: msg });
-        }
-        return Promise.resolve(msg);
+      const response = await axios.post(`/api/register`, credentials);
+      const { data: { msg }, status } = response;
+      let { username, email } = credentials;
+  
+      // Send email
+      if (status === 201) {
+        await axios.post('/api/registerMail', { username, userEmail: email, text: msg });
+      }
+  
+      return Promise.resolve(msg);
     } catch (error) {
-        return Promise.reject({error});
+      if (error.response && error.response.status === 400 && error.response.data.error === 'Duplicate field value entered') {
+        // Handle duplicate key error
+        return Promise.reject({ error: 'Username or email is already in use. Please choose a different one.' });
+      } else {
+        // Handle other errors
+        return Promise.reject({ error: 'An error occurred during registration. Please try again later.' });
+      }
     }
-};
+  }
+  
 
 //login function
 export async function verifyPassword({username, password}){
