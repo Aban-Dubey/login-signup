@@ -1,14 +1,14 @@
 import axios from 'axios';
 import {jwtDecode} from 'jwt-decode';
 
-axios.defaults.baseURL = "https://login-signup-server-lilac.vercel.app";
+// axios.defaults.baseURL = "https://login-signup-server-lilac.vercel.app";
 
 //Make API requests
 
 //Authentication function
 export async function authenticate(username){
     try {
-        return axios.post('/api/authenticate', { username });
+        return axios.post('https://login-signup-server-lilac.vercel.app/api/authenticate', { username });
     } catch (error) {
         return { error: "Username does not exist!"}
     }
@@ -17,7 +17,7 @@ export async function authenticate(username){
 //Get user details
 export async function getUser({username}) {
     try {
-        const { data } = await axios.get(`/api/user/${username}`);
+        const { data } = await axios.get(`https://login-signup-server-lilac.vercel.app/api/user/${username}`);
         return {data};
     } catch (error) {
         return {error: "Password does not match!"};
@@ -43,13 +43,13 @@ export async function getUser({username}) {
 // Register user
 export async function registerUser(credentials) {
     try {
-      const response = await axios.post(`/api/register`, credentials);
+      const response = await axios.post(`https://login-signup-server-lilac.vercel.app/api/register`, credentials);
       const { data: { msg }, status } = response;
       let { username, email } = credentials;
   
       // Send email
       if (status === 201) {
-        await axios.post('/api/registerMail', { username, userEmail: email, text: msg });
+        await axios.post('https://login-signup-server-lilac.vercel.app/api/registerMail', { username, userEmail: email, text: msg });
       }
   
       return Promise.resolve(msg);
@@ -69,7 +69,7 @@ export async function registerUser(credentials) {
 export async function verifyPassword({username, password}){
     try {
         if(username){
-            const { data } = await axios.post('/api/login', { username, password });
+            const { data } = await axios.post('https://login-signup-server-lilac.vercel.app/api/login', { username, password });
             return Promise.resolve({data});
         }
     } catch (error) {
@@ -81,7 +81,7 @@ export async function verifyPassword({username, password}){
 export async function updateUser(response){
     try {
         const token = await localStorage.getItem('token');
-        const data = await axios.put('/api/updateUser', response, { headers: { "Authorization": `Bearer ${token}`}});
+        const data = await axios.put('https://login-signup-server-lilac.vercel.app/api/updateUser', response, { headers: { "Authorization": `Bearer ${token}`}});
         console.log('data updated successfully!');
         return Promise.resolve({data});
     } catch (error) {
@@ -92,7 +92,7 @@ export async function updateUser(response){
 //Generate OTP
 export async function generateOTP(username) {
     try {
-        const {data: {code}, status} = await axios.get('/api/generateOTP', { params: { username }});
+        const {data: {code}, status} = await axios.get('https://login-signup-server-lilac.vercel.app/api/generateOTP', { params: { username }});
 
         //send mail with the OTP
         if(status === 201){
@@ -109,7 +109,7 @@ export async function generateOTP(username) {
 //Verify OTP
 export async function verifyOTP({ username, code }){
     try {
-        const { data, status } = await axios.get('/api/verifyOTP', {params: { username, code }});
+        const { data, status } = await axios.get('https://login-signup-server-lilac.vercel.app/api/verifyOTP', {params: { username, code }});
         return { data, status };
     } catch (error) {
         return Promise.reject({error: "Cannot verify OTP!"});
@@ -119,7 +119,7 @@ export async function verifyOTP({ username, code }){
 //Reset Password
 export async function resetPassword({ username, password }){
     try {
-        const { data, status } = await axios.put('/api/resetPassword', { username, password });
+        const { data, status } = await axios.put('https://login-signup-server-lilac.vercel.app/api/resetPassword', { username, password });
         return Promise.resolve({ data, status });
     } catch (error) {
         return Promise.reject({error: "Cannot reset password!"});
