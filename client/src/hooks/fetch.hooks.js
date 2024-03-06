@@ -2,7 +2,7 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { getUsername } from "../helper/helper.js";
 
-axios.defaults.baseURL = "http://localhost:8080";
+axios.defaults.baseURL = "https://login-signup-server-lilac.vercel.app/";
 
 //custom hook
 export default function useFetch(query){
@@ -16,7 +16,7 @@ export default function useFetch(query){
                  
                 const {username} = !query ? await getUsername() : '';
 
-                const { data, status } = !query? await axios.get(`api/user/${username}`) : await axios.get(`/api/${query}`);
+                const { data, status } = !query? await axios.get(`api/user/${username}`) : await axios.get(`api/${query}`);
 
                 if(status === 201){
                     setData(prev=>({ ...prev, isLoading: false}));
