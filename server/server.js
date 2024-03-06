@@ -12,7 +12,9 @@ const app = express();
 // app.use(express.json());
 app.use(bodyParser.json({ limit: '50mb' }));
 app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
+
 app.use(cors());
+
 app.use(morgan('tiny'));
 app.disable('x-powered-by'); //less hackers know about our stack
 app.use((err, req, res, next) => {
