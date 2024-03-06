@@ -14,7 +14,7 @@ router.post("/authenticate",verifyUser,(req,res)=>res.end());
 router.post("/login",verifyUser,login);
 
 //GET routes
-router.get("user/:username",getUser);
+router.get("/user/:username",getUser);
 router.get("/generateOTP",verifyUser,localVariables,generateOtp);
 router.get("/verifyOTP",verifyUser, verifyOtp);
 router.get("/createResetSession",createResetSession);
